@@ -70,7 +70,10 @@ const userSchema = new mongoose.Schema(
       default: Date.now,
     },
   },
-  { timestamps: true }
+  { timestamps: true,
+    toJSON: {virtuals: true},
+    toObject: {virtuals: true}
+ }
 );
 
 //hashing the password
@@ -94,7 +97,14 @@ userSchema.methods.getResetPasswordToken = function () {
   return resetToken;
 };
 
+userSchema.methods.updateLastActive = function () {
+  this.lastActive = Date.now();
+  return this.lastActive({ validateBeforeSave: false });
+};
+
 // virtual field for total enrolled courses
-userSchema
+userSchema.virtual("totalEnrolledCourses").get(function () {
+  return this.enrolledCourses.lenght;
+});
 
 export const User = mongoose.model("User", userSchema);
