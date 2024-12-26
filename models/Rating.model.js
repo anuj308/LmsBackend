@@ -2,12 +2,12 @@ import mongoose from "mongoose";
 
 const RatingSchema = new mongoose.Schema(
     {
-        courseId: {
+        course: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Course",
             required: [true, "Course is required"],
         },
-        UserId: {
+        User: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: [true, "User is required"],
