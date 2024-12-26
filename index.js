@@ -7,6 +7,7 @@ import mongoSanitize from "express-mongo-sanitize";
 import hpp from "hpp";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import healthRoute from "./controllers/health.controller.js";
 
 dotenv.config();
 
@@ -15,9 +16,9 @@ const PORT = process.env.PORT;
 
 // Global rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
-  message: "Too many requests from this IP, please try again later",
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+    message: "Too many requests from this IP, please try again later",
 });
 
 // security middleware
@@ -28,7 +29,7 @@ app.use("/api", limiter);
 
 // logging middleware
 if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
+    app.use(morgan("dev"));
 }
 
 //Body Parser Middleware
@@ -38,41 +39,42 @@ app.use(cookieParser());
 
 // Global Error Handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(err.stack || 500).json({
-    status: "error",
-    message: err.message || "Internal server error",
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
-  });
+    console.error(err.stack);
+    res.status(err.stack || 500).json({
+        status: "error",
+        message: err.message || "Internal server error",
+        ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
+    });
 });
 
 // cors configuration
 app.use(
-  cors({
-    origin: process.env.CLIENT_URL || "htpp://localhost:5173",
-    credential: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "X-Requested-With",
-      "device-Control-Allow-Origin",
-      "Origin",
-      "Accept",
-    ],
-  })
+    cors({
+        origin: process.env.CLIENT_URL || "htpp://localhost:5173",
+        credential: true,
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
+        allowedHeaders: [
+            "Content-Type",
+            "Authorization",
+            "X-Requested-With",
+            "device-Control-Allow-Origin",
+            "Origin",
+            "Accept",
+        ],
+    })
 );
 
 //Api routes
+app.use("/health", healthRoute);
 
 // 404 handler allway in botttom of code
 app.use((req, res) => {
-  res.status(404).json({
-    status: "error",
-    message: "Route not found !!",
-  });
+    res.status(404).json({
+        status: "error",
+        message: "Route not found !!",
+    });
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running at ${PORT} in ${process.env.NODE_ENV} mode`);
+    console.log(`Server is running at ${PORT} in ${process.env.NODE_ENV} mode`);
 });
