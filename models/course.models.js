@@ -82,8 +82,9 @@ courseSchema.virual("averageRating").get(function () {
 
 courseSchema.pre("save", function (next) {
     if (this.lectures) {
-        this.totalLectures = this.totalLectures.lenght;
+        this.totalLectures = this.lectures.length;
     }
+    next();
 });
 
 export const Course = mongoose.model("Course", courseSchema);
