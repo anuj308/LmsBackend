@@ -7,7 +7,9 @@ import mongoSanitize from "express-mongo-sanitize";
 import hpp from "hpp";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+
 import healthRoute from "./controllers/health.controller.js";
+import userRoute from "./controllers/user.controller.js";
 
 dotenv.config();
 
@@ -66,6 +68,7 @@ app.use(
 
 //Api routes
 app.use("/health", healthRoute);
+app.use("/api/v1/user", userRoute);
 
 // 404 handler allway in botttom of code
 app.use((req, res) => {
