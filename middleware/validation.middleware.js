@@ -1,13 +1,14 @@
 import { body, param, query, validationResult } from "express-validator";
+import { ApiError } from "./error.middleware.js";
 
 export const validate = (validations) => {
     return async (req, res, next) => {
         // run all validation
-        await Promise.all(validations.map(validation.run(req)));
+        await Promise.all(validations.map((validation) => validation.run(req)));
 
         const errors = validationResult(req);
         if (errors.isEmpty()) {
-            next();
+            return next();
         }
 
         const extractedError = errors.array().map((err) => ({
@@ -15,7 +16,7 @@ export const validate = (validations) => {
             message: err.msg,
         }));
 
-        throw new Error("validation error");
+        throw new ApiError(400, "validation error");
     };
 };
 
@@ -34,10 +35,29 @@ export const commonValidations = {
         .isEmail()
         .normalizeEmail()
         .withMessage("Please provide a valid email"),
-    name: body("name").trim().isLength({ min: 2, max: 50 }),
+    password: body("password")
+        .isLength({ min: 8 })
+        .withMessage("Password must be at least 8 characters long")
+        .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])/)
+        .withMessage(
+            "Password must contain at least one number, one uppercase letter, one lowercase letter, and one special character"
+        ),
+    name: body("name")
+        .trim()
+        .isLength({ min: 2, max: 50 })
+        .withMessage("Name must be between 2 and 50 characters")
+        .matches(/^[a-zA-Z\s]*$/)
+        .withMessage("Name can only contain letters and spaces"),
+
+    price: body("price")
+        .isFloat({ min: 0 })
+        .withMessage("Price must be a positive number"),
+
+    url: body("url").isURL().withMessage("Please provide a valid URL"),
 };
 
 export const validateSignUp = validate([
     commonValidations.email,
     commonValidations.name,
+    commonValidations.password,
 ]);

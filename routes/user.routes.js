@@ -12,7 +12,7 @@ import upload from "../utils/multer.js";
 import { validateSignUp } from "../middleware/validation.middleware.js";
 
 // Auth routes
-router.get("/signup", validateSignUp, createUserAccount);
+router.post("/signup", validateSignUp, createUserAccount);
 router.post("/signin", authenticateUser);
 router.post("/signout", signOutUser);
 

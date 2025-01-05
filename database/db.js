@@ -35,8 +35,6 @@ class DatabaseConnection {
             }
 
             const connectOptions = {
-                useNewUrlParser: true,
-                useUnifiedTopology: true,
                 maxPoolSize: 10,
                 serverSelectionTimeoutMS: 5000,
                 socketTimeoutMS: 45000,

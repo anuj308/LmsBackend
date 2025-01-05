@@ -1,7 +1,7 @@
-import { ApiError, catchAsync } from "../middleware/error.middleware";
-import User from "../models/user.model.js";
+import { ApiError, catchAsync } from "../middleware/error.middleware.js";
+import { User } from "../models/user.model.js";
 import { generateToken } from "../utils/generateToken.js";
-import uploadMedia, { deleteMediaFromCloudinary } from "../utils/cloudinary.js";
+import { uploadMedia, deleteMediaFromCloudinary } from "../utils/cloudinary.js";
 
 export const createUserAccount = catchAsync(async (req, res) => {
     const { name, email, password, role = "student" } = req.body;
@@ -17,14 +17,15 @@ export const createUserAccount = catchAsync(async (req, res) => {
         password,
         role,
     });
-    await User.updateLastActive();
+    console.log("hbdiu");
+    await user.updateLastActive();
     generateToken(res, user, "Account Created Successfully");
 });
 
 export const authenticateUser = catchAsync(async (req, res) => {
     const { email, password } = req.body;
 
-    const user = User.findOne({ email: email.toLowerCase() }).select(
+    const user = await User.findOne({ email: email.toLowerCase() }).select(
         "+password"
     );
     if (!user || !(await user.comparePassword(password))) {
