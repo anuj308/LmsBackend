@@ -3,6 +3,7 @@ import {
     authenticateUser,
     createUserAccount,
     getCurrentUserProfile,
+    googleLogin,
     signOutUser,
     updateUserProfile,
 } from "../controllers/user.controller.js";
@@ -13,6 +14,7 @@ import { validateSignUp } from "../middleware/validation.middleware.js";
 
 // Auth routes
 router.post("/signup", validateSignUp, createUserAccount);
+router.post("/loginWithGoogle", googleLogin);
 router.post("/signin", authenticateUser);
 router.post("/signout", signOutUser);
 

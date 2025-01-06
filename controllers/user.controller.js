@@ -11,13 +11,15 @@ export const createUserAccount = catchAsync(async (req, res) => {
         throw new ApiError(400, "User already exists");
     }
 
-    const user = await User.create({
+    const createUser = await User.create({
         name,
         email: email.toLowerCase(),
         password,
         role,
     });
-    console.log("hbdiu");
+
+    const user = await User.findById(createUser._id);
+
     await user.updateLastActive();
     generateToken(res, user, "Account Created Successfully");
 });
@@ -31,6 +33,27 @@ export const authenticateUser = catchAsync(async (req, res) => {
     if (!user || !(await user.comparePassword(password))) {
         throw new ApiError(401, "Invalid email or password");
     }
+    await user.updateLastActive();
+    generateToken(res, user, `Welcome back ${user.name}`);
+});
+
+export const googleLogin = catchAsync(async (req, res) => {
+    const { name, email, role = "student", picture } = req.body;
+
+    const user = await User.findOne({ email: email.toLowerCase() });
+
+    if (!user) {
+        const user = User({
+            name,
+            email: email.toLowerCase(),
+            role,
+            avatar: picture,
+        });
+        await user.save({ validateBeforeSave: false });
+        await user.updateLastActive();
+        generateToken(res, user, "Account Created Successfully");
+    }
+
     await user.updateLastActive();
     generateToken(res, user, `Welcome back ${user.name}`);
 });
